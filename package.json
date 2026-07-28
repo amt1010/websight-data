@@ -13,7 +13,9 @@
     "worker": "tsx src/workerMain.ts",
     "cli": "tsx src/cli.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "seed:plans": "tsx src/seedPlans.ts",
+    "seed:admin": "tsx src/seedAdmin.ts --"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.686.0",
