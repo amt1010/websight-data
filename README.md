@@ -3,8 +3,10 @@
 Persistence, job queue, and object storage for WebSight (Phase 3 of the
 WebSight roadmap). Wraps `websight-crawler`'s `crawl()` in a BullMQ job:
 results are uploaded to Cloudflare R2 (screenshots/HTML) and persisted to
-Postgres (Neon) via Drizzle. No REST/GraphQL API yet — see the design spec
-in `docs/superpowers/specs/2026-07-28-phase-3-data-jobs-design.md`.
+Postgres (Neon) via Drizzle. See the design spec in
+`docs/superpowers/specs/2026-07-28-phase-3-data-jobs-design.md`. (This repo
+also now hosts a separate auth/guest/paid-gating HTTP API — see below — but
+Phase 3's own crawl pipeline still has no REST/GraphQL API in front of it.)
 
 ## Setup
 
@@ -44,3 +46,21 @@ mocks, so `vitest.config.ts` disables file-level parallelism
 (`fileParallelism: false`) — otherwise concurrent test files racing against
 the same tables/queue cause spurious foreign-key and "row not found"
 failures.
+
+## Auth / guest / paid gating API
+
+As of the auth-subscriptions-api branch, this repo also exposes a small
+Vercel-serverless HTTP API (`api/`) gating scans by guest/free/paid tier,
+independent of the crawl pipeline above:
+
+    npm run seed:plans          # creates the seeded Free plan (idempotent)
+    npm run seed:admin -- <email>  # promotes an existing user to admin
+
+Endpoints: `POST /api/scans/guest-init`, `POST /api/scans/consume`,
+`GET /api/me`, `GET/POST/PATCH/DELETE /api/admin/plans`,
+`GET/PATCH /api/admin/users`. Requires `CLERK_SECRET_KEY` (see
+`.env.example`). Deployed as its own Vercel project, separate from
+`websight-base`'s frontend deployment — see
+`docs/superpowers/specs/2026-07-28-auth-subscriptions-api-design.md` for the
+full design, including why the BullMQ worker's hosting gap is out of scope
+here.
