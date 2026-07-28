@@ -1,5 +1,5 @@
 import { Queue } from 'bullmq';
-import type IORedis from 'ioredis';
+import type { Redis } from 'ioredis';
 import type { CrawlOptions } from 'websight-crawler';
 import type { Db } from '../db/client.js';
 import { insertQueuedCrawl } from '../db/crawls.js';
@@ -10,7 +10,7 @@ export interface CrawlJobData {
   options: Partial<CrawlOptions>;
 }
 
-export function createCrawlQueue(connection: IORedis): Queue<CrawlJobData> {
+export function createCrawlQueue(connection: Redis): Queue<CrawlJobData> {
   return new Queue<CrawlJobData>('crawl', { connection });
 }
 

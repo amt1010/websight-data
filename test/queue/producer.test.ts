@@ -3,11 +3,11 @@ import { createTestConnection } from '../helpers/testRedis.js';
 import { createTestDb, resetDb, type TestDb } from '../helpers/testDb.js';
 import { createCrawlQueue, enqueueCrawl } from '../../src/queue/producer.js';
 import { getCrawlStatus } from '../../src/db/crawls.js';
-import type IORedis from 'ioredis';
+import type { Redis } from 'ioredis';
 import type { Queue } from 'bullmq';
 import type { CrawlJobData } from '../../src/queue/producer.js';
 
-let connection: IORedis;
+let connection: Redis;
 let queue: Queue<CrawlJobData>;
 let db: TestDb;
 

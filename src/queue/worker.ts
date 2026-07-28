@@ -1,5 +1,5 @@
 import { Worker } from 'bullmq';
-import type IORedis from 'ioredis';
+import type { Redis } from 'ioredis';
 import { crawl } from 'websight-crawler';
 import type { Db } from '../db/client.js';
 import { markCrawlRunning, markCrawlFailed, persistCrawlResult } from '../db/crawls.js';
@@ -50,7 +50,7 @@ export async function handleCrawlJob(
   }
 }
 
-export function createCrawlWorker(connection: IORedis, db: Db, storage: Storage): Worker<CrawlJobData> {
+export function createCrawlWorker(connection: Redis, db: Db, storage: Storage): Worker<CrawlJobData> {
   return new Worker<CrawlJobData>(
     'crawl',
     async (job) => {
