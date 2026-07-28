@@ -12,6 +12,16 @@ in `docs/superpowers/specs/2026-07-28-phase-3-data-jobs-design.md`.
     cp .env.example .env   # fill in DATABASE_URL, REDIS_URL, R2_*
     npm run db:migrate
 
+`db:migrate` only applies to whatever `DATABASE_URL` resolves to at the time
+you run it (`drizzle.config.ts` falls back to `TEST_DATABASE_URL` if
+`DATABASE_URL` is unset) — it does not also migrate the other one. Since
+`DATABASE_URL` and `TEST_DATABASE_URL` are two separate Neon branches, run
+`db:migrate` once against **each** (e.g. `DATABASE_URL=$TEST_DATABASE_URL npm
+run db:migrate` for the test branch, then again with `DATABASE_URL` set to
+the real branch) whenever the schema changes, and before the first real
+`npm run cli -- enqueue`/`npm run worker` run against a fresh prod branch —
+otherwise `enqueue`/the worker fail with `relation "crawls" does not exist`.
+
 ## Commands
 
     npm run typecheck
