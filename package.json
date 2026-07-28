@@ -1,0 +1,35 @@
+{
+  "name": "websight-data",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "bin": { "websight-data": "./dist/cli.js" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "worker": "tsx src/workerMain.ts",
+    "cli": "tsx src/cli.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.686.0",
+    "@neondatabase/serverless": "^0.10.1",
+    "bullmq": "^5.21.2",
+    "drizzle-orm": "^0.36.1",
+    "ioredis": "^5.4.1",
+    "websight-crawler": "github:amt1010/websight-crawler#v0.2.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "@types/ws": "^8.5.13",
+    "drizzle-kit": "^0.27.1",
+    "typescript": "^5.6.3",
+    "tsx": "^4.19.2",
+    "vitest": "^2.1.4"
+  }
+}
