@@ -48,3 +48,29 @@ export const integrations = pgTable('integrations', {
   category: text('category').notNull(),
   matchedUrls: jsonb('matched_urls').notNull().$type<string[]>(),
 });
+
+export const plans = pgTable('plans', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  tier: text('tier', { enum: ['free', 'paid'] }).notNull(),
+  scanLimit: integer('scan_limit').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  clerkUserId: text('clerk_user_id').notNull().unique(),
+  email: text('email').notNull(),
+  role: text('role', { enum: ['user', 'admin'] }).notNull().default('user'),
+  planId: integer('plan_id')
+    .notNull()
+    .references(() => plans.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const scanUsage = pgTable('scan_usage', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id),
+  guestToken: text('guest_token'),
+  scannedAt: timestamp('scanned_at', { withTimezone: true }).notNull().defaultNow(),
+});

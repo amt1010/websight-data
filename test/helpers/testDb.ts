@@ -2,7 +2,7 @@ import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from 'ws';
 import * as schema from '../../src/db/schema.js';
-import { crawls, pages, clusters, integrations } from '../../src/db/schema.js';
+import { crawls, pages, clusters, integrations, plans, users, scanUsage } from '../../src/db/schema.js';
 
 neonConfig.webSocketConstructor = ws;
 
@@ -22,4 +22,7 @@ export async function resetDb(db: TestDb): Promise<void> {
   await db.delete(clusters);
   await db.delete(integrations);
   await db.delete(crawls);
+  await db.delete(scanUsage);
+  await db.delete(users);
+  await db.delete(plans);
 }
