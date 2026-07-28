@@ -1,7 +1,10 @@
-import { Pool } from '@neondatabase/serverless';
+import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
+import ws from 'ws';
 import * as schema from '../../src/db/schema.js';
 import { crawls, pages, clusters, integrations } from '../../src/db/schema.js';
+
+neonConfig.webSocketConstructor = ws;
 
 export function createTestDb() {
   const url = process.env.TEST_DATABASE_URL;

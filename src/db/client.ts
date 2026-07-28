@@ -1,6 +1,13 @@
-import { Pool } from '@neondatabase/serverless';
+import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
+import ws from 'ws';
 import * as schema from './schema.js';
+
+// @neondatabase/serverless connects over WebSocket and only picks up an
+// environment's global WebSocket implicitly (stable in Node >=22) — wire
+// the `ws` package explicitly so this also works on Node 20, which the
+// engines field and CI target.
+neonConfig.webSocketConstructor = ws;
 
 function requireEnv(name: string): string {
   const value = process.env[name];
