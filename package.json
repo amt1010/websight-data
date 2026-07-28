@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.686.0",
+    "@clerk/backend": "^1.24.0",
     "@neondatabase/serverless": "^0.10.1",
     "bullmq": "^5.21.2",
     "drizzle-orm": "^0.36.1",
