@@ -15,4 +15,11 @@ describe('createInMemoryStorage', () => {
     const storage = createInMemoryStorage();
     await expect(storage.get('missing')).rejects.toThrow();
   });
+
+  it('returns a signed URL for the in-memory fake', async () => {
+    const storage = createInMemoryStorage();
+    await storage.put('k.png', Buffer.from('x'), 'image/png');
+    const url = await storage.getSignedUrl('k.png', 3600);
+    expect(url).toBe('memory://k.png?expires=3600');
+  });
 });
