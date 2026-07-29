@@ -6,6 +6,8 @@ export const crawls = pgTable('crawls', {
   status: text('status', { enum: ['queued', 'running', 'done', 'failed'] })
     .notNull()
     .default('queued'),
+  userId: integer('user_id').references(() => users.id),
+  guestToken: text('guest_token'),
   startedAt: timestamp('started_at', { withTimezone: true }),
   finishedAt: timestamp('finished_at', { withTimezone: true }),
   error: text('error'),

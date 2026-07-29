@@ -34,4 +34,10 @@ describe('enqueueCrawl', () => {
     const job = await queue.getJob(`crawl-${crawlId}`);
     expect(job?.data).toEqual({ crawlId, domain: 'example.com', options: {} });
   });
+
+  it('threads an owner through to the crawls row', async () => {
+    const crawlId = await enqueueCrawl(db, queue, 'example.com', {}, { guestToken: 'guest-abc' });
+    const row = await getCrawlStatus(db, crawlId);
+    expect(row?.guestToken).toBe('guest-abc');
+  });
 });
