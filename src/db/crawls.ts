@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, and, isNull, desc } from 'drizzle-orm';
 import type { CrawlResult } from 'websight-crawler';
 import type { Db } from './client.js';
 import { crawls, pages, clusters, integrations } from './schema.js';
@@ -26,6 +26,26 @@ export async function markCrawlFailed(db: Db, crawlId: number, error: string): P
 export async function getCrawlStatus(db: Db, crawlId: number) {
   const [row] = await db.select().from(crawls).where(eq(crawls.id, crawlId));
   return row ?? null;
+}
+
+export async function getCrawlPages(db: Db, crawlId: number) {
+  return db.select().from(pages).where(eq(pages.crawlId, crawlId));
+}
+
+export async function getCrawlClusters(db: Db, crawlId: number) {
+  return db.select().from(clusters).where(eq(clusters.crawlId, crawlId));
+}
+
+export async function getCrawlIntegrations(db: Db, crawlId: number) {
+  return db.select().from(integrations).where(eq(integrations.crawlId, crawlId));
+}
+
+export async function listCrawlsForOwner(db: Db, owner: { userId?: number; guestToken?: string }) {
+  const condition =
+    owner.userId !== undefined
+      ? and(eq(crawls.userId, owner.userId), isNull(crawls.guestToken))
+      : and(eq(crawls.guestToken, owner.guestToken!), isNull(crawls.userId));
+  return db.select().from(crawls).where(condition).orderBy(desc(crawls.id));
 }
 
 export async function persistCrawlResult(
