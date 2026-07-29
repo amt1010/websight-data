@@ -10,6 +10,7 @@ import {
 import { findOrCreateUser, getUserWithPlan } from '../../src/db/users.js';
 import { createClerkVerifier, type ClerkVerifier } from '../../src/auth/clerk.js';
 import { QuotaExceededError, errorToResponse } from '../../src/http/errors.js';
+import { applyCors } from '../../src/http/cors.js';
 import { requireEnv } from '../../src/env.js';
 import { validateGuestToken } from './guest-init.js';
 
@@ -41,6 +42,7 @@ export async function consumeScan(
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (applyCors(req, res)) return;
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
     return;

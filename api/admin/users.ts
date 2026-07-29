@@ -3,6 +3,7 @@ import { createDb, type Db } from '../../src/db/client.js';
 import { findOrCreateUser, listUsersWithPlans, updateUserPlan } from '../../src/db/users.js';
 import { createClerkVerifier, type ClerkVerifier } from '../../src/auth/clerk.js';
 import { ForbiddenError, BadRequestError, errorToResponse } from '../../src/http/errors.js';
+import { applyCors } from '../../src/http/cors.js';
 import { requireEnv } from '../../src/env.js';
 
 async function requireAdmin(db: Db, clerkVerifier: ClerkVerifier, authHeader: string | undefined) {
@@ -32,6 +33,7 @@ export async function handleUsersRequest(
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (applyCors(req, res)) return;
   try {
     const clerkVerifier = createClerkVerifier(requireEnv('CLERK_SECRET_KEY'));
     const result = await handleUsersRequest(

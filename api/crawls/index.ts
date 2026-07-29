@@ -15,6 +15,7 @@ import { getUserWithPlan } from '../../src/db/users.js';
 import { createClerkVerifier, type ClerkVerifier } from '../../src/auth/clerk.js';
 import { resolveIdentity } from '../../src/auth/identity.js';
 import { BadRequestError, QuotaExceededError, errorToResponse } from '../../src/http/errors.js';
+import { applyCors } from '../../src/http/cors.js';
 import { requireEnv } from '../../src/env.js';
 
 export function normalizeDomain(input: unknown): string {
@@ -72,6 +73,7 @@ export async function listCrawls(
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (applyCors(req, res)) return;
   try {
     const clerkVerifier = createClerkVerifier(requireEnv('CLERK_SECRET_KEY'));
     const db = createDb();
