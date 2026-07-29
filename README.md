@@ -33,6 +33,28 @@ otherwise `enqueue`/the worker fail with `relation "crawls" does not exist`.
     npm run cli -- status <crawlId>   # print a crawl's row as JSON
     npm run worker                    # start the long-running job worker
 
+## Deploying the worker
+
+`npm run worker` (above) is the local-dev path. In production the worker
+runs as an always-on Railway service built from the repo's `Dockerfile`
+(pinned to `mcr.microsoft.com/playwright:v1.62.0-jammy` — keep this in
+sync with the `playwright` version resolved in `package-lock.json`) and
+`railway.json`.
+
+One-time setup (Railway dashboard):
+
+1. Create a new Railway project, connect the `websight-data` GitHub repo.
+   Railway will detect `railway.json` and build with the Dockerfile.
+2. Set these environment variables on the service: `REDIS_URL`,
+   `DATABASE_URL`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`,
+   `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` (same values as `.env.example`,
+   pointed at the real Neon/Upstash/R2 instances, not the test ones).
+3. Deploy. Railway auto-deploys on every push to `main` from then on,
+   same as the Vercel projects in this repo's sibling repos.
+
+The worker has no HTTP surface — it's a background service, not a web
+service; don't attach a port or health-check URL to it in Railway.
+
 ## Status
 
 Automated: `npm test` covers crawl-row persistence (against a real Neon test
