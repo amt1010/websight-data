@@ -25,8 +25,11 @@ worker.on('failed', (job, err) => {
   console.error(`Job ${job?.id} failed:`, err);
 });
 
-process.on('SIGINT', async () => {
+async function shutdown(): Promise<void> {
   await worker.close();
   await connection.quit();
   process.exit(0);
-});
+}
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
