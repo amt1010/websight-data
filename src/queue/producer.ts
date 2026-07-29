@@ -18,9 +18,10 @@ export async function enqueueCrawl(
   db: Db,
   queue: Queue<CrawlJobData>,
   domain: string,
-  options: Partial<CrawlOptions> = {}
+  options: Partial<CrawlOptions> = {},
+  owner: { userId?: number; guestToken?: string } = {}
 ): Promise<number> {
-  const crawlId = await insertQueuedCrawl(db, domain);
+  const crawlId = await insertQueuedCrawl(db, domain, owner);
   await queue.add('crawl', { crawlId, domain, options }, { jobId: `crawl-${crawlId}` });
   return crawlId;
 }
