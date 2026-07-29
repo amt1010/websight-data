@@ -4,6 +4,7 @@ import { findOrCreateUser, getUserWithPlan } from '../src/db/users.js';
 import { countScansForUser } from '../src/db/scanUsage.js';
 import { createClerkVerifier, type ClerkVerifier } from '../src/auth/clerk.js';
 import { errorToResponse } from '../src/http/errors.js';
+import { applyCors } from '../src/http/cors.js';
 import { requireEnv } from '../src/env.js';
 
 export async function getMe(db: Db, clerkVerifier: ClerkVerifier, authHeader: string | undefined) {
@@ -20,6 +21,7 @@ export async function getMe(db: Db, clerkVerifier: ClerkVerifier, authHeader: st
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (applyCors(req, res)) return;
   if (req.method !== 'GET') {
     res.status(405).json({ error: 'Method not allowed' });
     return;

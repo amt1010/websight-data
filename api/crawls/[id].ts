@@ -5,6 +5,7 @@ import { createR2Storage, type Storage } from '../../src/storage/index.js';
 import { createClerkVerifier, type ClerkVerifier } from '../../src/auth/clerk.js';
 import { resolveIdentity } from '../../src/auth/identity.js';
 import { BadRequestError, ForbiddenError, NotFoundError, errorToResponse } from '../../src/http/errors.js';
+import { applyCors } from '../../src/http/cors.js';
 import { requireEnv } from '../../src/env.js';
 
 const SIGNED_URL_EXPIRY_SECONDS = 3600;
@@ -57,6 +58,7 @@ export async function getCrawlDetail(
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (applyCors(req, res)) return;
   if (req.method !== 'GET') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
