@@ -7,6 +7,8 @@ import {
   getCrawlStatus,
   persistCrawlResult,
 } from '../../src/db/crawls.js';
+import { createPlan } from '../../src/db/plans.js';
+import { findOrCreateUser } from '../../src/db/users.js';
 import type { CrawlResult } from 'websight-crawler';
 
 let db: TestDb;
@@ -86,5 +88,24 @@ describe('crawl row lifecycle', () => {
     const row = await getCrawlStatus(db, crawlId);
     expect(row?.status).toBe('done');
     expect(row?.finishedAt).not.toBeNull();
+  });
+
+  it('records an owner (userId or guestToken) when provided', async () => {
+    await createPlan(db, { name: 'Free', tier: 'free', scanLimit: 3 });
+    const user = await findOrCreateUser(db, 'clerk_1', 'a@example.com');
+
+    const withUser = await insertQueuedCrawl(db, 'example.com', { userId: user.id });
+    const userRow = await getCrawlStatus(db, withUser);
+    expect(userRow).toMatchObject({ userId: user.id, guestToken: null });
+
+    const withGuest = await insertQueuedCrawl(db, 'example.com', { guestToken: 'guest-xyz' });
+    const guestRow = await getCrawlStatus(db, withGuest);
+    expect(guestRow).toMatchObject({ userId: null, guestToken: 'guest-xyz' });
+  });
+
+  it('defaults to no owner when none is provided', async () => {
+    const crawlId = await insertQueuedCrawl(db, 'example.com');
+    const row = await getCrawlStatus(db, crawlId);
+    expect(row).toMatchObject({ userId: null, guestToken: null });
   });
 });

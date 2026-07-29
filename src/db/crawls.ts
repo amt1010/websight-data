@@ -3,8 +3,15 @@ import type { CrawlResult } from 'websight-crawler';
 import type { Db } from './client.js';
 import { crawls, pages, clusters, integrations } from './schema.js';
 
-export async function insertQueuedCrawl(db: Db, domain: string): Promise<number> {
-  const [row] = await db.insert(crawls).values({ domain, status: 'queued' }).returning({ id: crawls.id });
+export async function insertQueuedCrawl(
+  db: Db,
+  domain: string,
+  owner: { userId?: number; guestToken?: string } = {}
+): Promise<number> {
+  const [row] = await db
+    .insert(crawls)
+    .values({ domain, status: 'queued', userId: owner.userId ?? null, guestToken: owner.guestToken ?? null })
+    .returning({ id: crawls.id });
   return row.id;
 }
 
