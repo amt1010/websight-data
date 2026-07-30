@@ -56,6 +56,14 @@ export function createCrawlWorker(connection: Redis, db: Db, storage: Storage): 
     async (job) => {
       await handleCrawlJob(db, storage, job.data);
     },
-    { connection }
+    {
+      connection,
+      // A real multi-page crawl (Playwright navigation + screenshots) routinely
+      // runs well past BullMQ's 30s default lockDuration. Once the lock lapses,
+      // BullMQ reassigns the job as stalled while the original attempt is still
+      // running, and the two race on the same browser context ("browserContext
+      // .close: Target page, context or browser has been closed").
+      lockDuration: 900_000,
+    }
   );
 }
